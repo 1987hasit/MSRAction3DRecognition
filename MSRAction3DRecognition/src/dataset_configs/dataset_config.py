@@ -11,7 +11,7 @@ datasetPath = "C:/MSRAction_dataset/"
 depthDataPath = os.path.join(datasetPath, "depth")
 skeletonDataPath = os.path.join(datasetPath, "skeleton")
 mappedSkeletonDataPath = os.path.join(datasetPath, "mapped_skeleton")
-datasetConfigPath = "./dataset_configs/msraction_configs/"
+datasetConfigPath = "./dataset_configs/train_test_splits/"
 
 depthFileExtension = "_sdepth.bin"
 skeletonFileExtension = "_skeleton3D.txt"
