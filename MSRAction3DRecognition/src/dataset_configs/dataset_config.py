@@ -12,8 +12,10 @@ depthDataPath = os.path.join(datasetPath, "depth")
 skeletonDataPath = os.path.join(datasetPath, "skeleton")
 mappedSkeletonDataPath = os.path.join(datasetPath, "mapped_skeleton")
 datasetConfigPath = "./dataset_configs/train_test_splits/"
+loadedDepthDataPath = "./saved_files/loaded_depth_data/"
 
 depthFileExtension = "_sdepth.bin"
+loadedDepthDataFileExtension = "_sdepth.pkl"
 skeletonFileExtension = "_skeleton3D.txt"
 mappedSkeletonFileExtension = "_skeleton.txt"
 

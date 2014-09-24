@@ -6,13 +6,23 @@ Created on 10 Sep 2014
 import numpy as np
 from scipy.misc.pilutil import bytescale  # @UnresolvedImport
 import math
+import cv2
+from cv2 import applyColorMap
 
 def mat2gray(mat):
     """ convert matrix to gray image (0-255) """
-    mat = mat.astype(np.uint16)
-    depthGray = bytescale(mat)
+#     mat = mat.astype(np.uint16)
+#     depthGray = bytescale(mat)
+    minItem = mat.min()
+    maxItem = mat.max()
     
-    return depthGray
+    grayImg = mat.copy()
+    if (maxItem - minItem) != 0:
+        tmpMat = (mat - minItem) / float(maxItem - minItem) # scale to [0-1]
+        grayImg = tmpMat * 255
+        grayImg = grayImg.astype(np.uint8)
+    
+    return grayImg
 
 
 def getEstimatedKinectFocalLength(width, height):
@@ -29,29 +39,3 @@ def getEstimatedKinectFocalLength(width, height):
     fy = (height / 2.0) / math.tan(math.radians(verticalAngle/2.0))
     
     return fx, fy
-
-def getWorldCoordinates(width, height, depthData):
-    """ get world coordinates from  """
-    fx = 525.0  # focal length x
-    fy = 525.0  # focal length y
-    cx = 319.5  # optical center x
-    cy = 239.5  # optical center y
-    
-    height, width = depthData.size()
-    
-    xwList = []
-    ywList = []
-    zwList = []
-    
-    for v in xrange(height):
-        for u in xrange(width):
-            zw = depthData(v,u);
-            xw = (u - cx) * zw / fx
-            yw = (v - cy) * zw / fy
-            
-            xwList.append(xw)
-            ywList.append(yw)
-            zwList.append(zw)
-            
-    return xwList, ywList, zwList
-    

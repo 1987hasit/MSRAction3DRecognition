@@ -4,23 +4,51 @@ Created on 10 Sep 2014
 @author: bliang03
 '''
 
-from dataset_configs import dataset_config
-from dataset_configs.dataset_config import depthFileExtension
+from dataset_configs.dataset_config import depthFileExtension, depthDataPath, \
+    trainConfigFile, testConfigFile, loadedDepthDataPath,\
+    loadedDepthDataFileExtension
 import os
 import numpy as np
-from argparse import Action
+from domain.action_domain import Action
+import pickle
+from cv2 import applyColorMap
+import cv2
+from utils import mat2gray
 
-def loadDataset():
-    """ load dataset"""
-    depthDataPath = dataset_config.depthDataPath
-    trainConfigFile = dataset_config.trainConfigFile
-    testConfigFile = dataset_config.testConfigFile
+
+def loadDepthData():
+    """Load dpeth data and save to file """
+    print "Loading depth data...\n"
     
-    trainActionList = loadActions(depthDataPath, trainConfigFile)
-    testActionList = loadActions(depthDataPath, testConfigFile)
+    depthFiles = os.listdir(depthDataPath)
+    for depthFile in depthFiles:
+        print depthFile
+        
+        depthSequence = readDepthFile(os.path.join(depthDataPath, depthFile))
+        saveFileName = os.path.splitext(depthFile)[0] + ".pkl"
+        ofile = open(os.path.join(loadedDepthDataPath, saveFileName), 'w')
+        pickle.dump(depthSequence, ofile)
+        ofile.close()
+        
+    print "Done!"
     
 
-def loadActions(depthDataPath, configFile):
+def loadTrainDataset():
+    """ load train dataset"""
+    trainActionList = loadActions(loadedDepthDataPath, trainConfigFile)
+    
+    return trainActionList
+
+
+def loadTestDataset():
+    """ load test dataset"""
+    # otherwise load from the original dataset, and then save to files
+    testActionList = loadActions(loadedDepthDataPath, testConfigFile)
+        
+    return testActionList
+
+
+def loadActions(loadedDepthDataPath, configFile):
     """ load depth data from given path and config file  """
     
     # load data from configFile
@@ -28,15 +56,22 @@ def loadActions(depthDataPath, configFile):
     lines = f.readlines()
     f.close()
     
-    msrActionList = []
+    actionList = []
     
     for line in lines:
         # remove '\n' at the end, and append file extension
-        depthFile = line[:-1] + depthFileExtension
-        msrAction = readDepthFile(os.path.join(depthDataPath, depthFile))
-        msrActionList.append(msrAction)
+        filename = line[:-1] + loadedDepthDataFileExtension
         
-    return msrActionList
+        # construct action object
+        action = Action(filename)
+        action.depthSequenceFile = os.path.join(loadedDepthDataPath, filename)
+        actionList.append(action)
+        
+        # print info
+        print "%s loaded." % filename
+        
+    return actionList
+
 
 def readDepthFile(depthFile):
     """ read depth file"""
@@ -61,19 +96,16 @@ def readDepthFile(depthFile):
         depthData = np.resize(depthData, (numRows, numCols)) 
         depthSequence.append(depthData)
 
-#         #show frame
+        #show frame
 #         # gray image
 #         grayImg = mat2gray(depthData)
 #         cv2.imshow('', grayImg)
+#         cv2.waitKey(150)
 #         
 #         # color map image
+#         grayImg = mat2gray(depthData)
 #         colorMapImg = applyColorMap(grayImg, cv2.COLORMAP_JET)  
 #         cv2.imshow('', colorMapImg)
-#         cv2.waitKey(200)
+#         cv2.waitKey(150)
 
-    # construct msr action object
-    filename = os.path.basename(depthFile)
-    action = Action(filename)
-    action.depthSequence = depthSequence
-    
-    return action
+    return depthSequence

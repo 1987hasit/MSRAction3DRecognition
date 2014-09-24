@@ -9,3 +9,7 @@ vertricalAngle = 43
 horizontalAngle = 57
 
 
+## image size
+width = 320
+height = 240
+

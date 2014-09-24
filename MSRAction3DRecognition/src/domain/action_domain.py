@@ -15,7 +15,10 @@ class Action:
         self._actionID = dataset_config.actionCateogory.index(self._actionName)
         self._subjectID = file_names[1]
         self._elementID = file_names[2]
-        self.depthSequence = None
+        self.depthSequenceFile = ""
+        self.xoyImgList = None
+        self.xozImgList = None
+        self.yozImgList = None
         
     @property
     def actionName(self):
